@@ -9,7 +9,6 @@ import java.util.TimeZone;
 public class BackendApplication {
 
     public static void main(String[] args) {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Kolkata"));
         SpringApplication.run(BackendApplication.class, args);
     }
 
