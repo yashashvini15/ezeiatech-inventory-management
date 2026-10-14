@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getMe } from "../services/authService";
 
 export default function Home() {
@@ -29,6 +29,11 @@ export default function Home() {
                     <p>Role: {user.role}</p>
                     <p>Status: {user.status}</p>
                     <p>Joined: {new Date(user.createdAt).toLocaleString()}</p>
+                    {user.role === "ADMIN" && (
+                        <p>
+                            <Link to="/categories">Categories</Link> | <Link to="/suppliers">Suppliers</Link>
+                        </p>
+                    )}
                 </div>
             )}
 
