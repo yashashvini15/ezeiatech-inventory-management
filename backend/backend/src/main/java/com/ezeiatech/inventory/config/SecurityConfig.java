@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
+                        .requestMatchers("/api/suppliers/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(e->e
                         .authenticationEntryPoint((req,res,ex) -> writeError(res,401,"Authentication required"))
