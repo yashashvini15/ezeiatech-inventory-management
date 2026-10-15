@@ -1,5 +1,6 @@
 package com.ezeiatech.inventory.service;
 
+import com.ezeiatech.inventory.dto.PageResponse;
 import com.ezeiatech.inventory.dto.ProductRequest;
 import com.ezeiatech.inventory.dto.ProductResponse;
 import com.ezeiatech.inventory.entity.Category;
@@ -15,6 +16,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ezeiatech.inventory.util.InputSanitizer;
+import com.ezeiatech.inventory.specification.ProductSpecs;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +65,27 @@ public class ProductService {
         find(id).setStatus(ProductStatus.INACTIVE);
     }
 
+    public PageResponse<ProductResponse> list(int page, int limit, String search, Long categoryId,
+                                              ProductStatus status, BigDecimal minPrice, BigDecimal maxPrice,
+                                              Boolean lowStock, String sortBy, String direction){
+        if(page < 1){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "page must be 1 or more");
+        }
+        if(limit < 1 || limit >100){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "limit must be between 1 and 100");
+        }
+        if(minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "minPrice cannot be greater than maxPrice");
+        }
+
+        Pageable pageable = PageRequest.of(page-1,limit,buildSort(sortBy, direction));
+
+        Specification<Product> spec = ProductSpecs.filter(search,categoryId,status,minPrice,maxPrice,lowStock);
+
+        Page<Product> result = productRepository.findAll(spec, pageable);
+        return PageResponse.from(result.map(ProductResponse::from));
+    }
+
     private Product find(Long id){
         return productRepository.findById(id)
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "Product not found"));
@@ -78,6 +107,23 @@ public class ProductService {
         p.setReorderLevel(req.getReorderLevel());
     }
 
+    private Sort buildSort(String sortBy, String direction){
+        String field = switch(sortBy == null ? "createdAt" : sortBy){
+            case "createdAt" -> "createdAt";
+            case "price" -> "price";
+            case "name" -> "name";
+            case "stock" -> "stock";
+            default -> throw new ApiException(HttpStatus.BAD_REQUEST, "sortBy must be one of: createdAt, price, name, stock");
+        };
+
+        if(direction != null && !direction.equalsIgnoreCase("asc") &&
+        !direction.equalsIgnoreCase("desc")){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "direction must be asc or desc");
+        }
+        Sort.Direction dir = "asc".equalsIgnoreCase(direction) ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        return Sort.by(dir,field).and(Sort.by(Sort.Direction.ASC, "id"));
+    }
     private String normalizeSku(String sku) {
         return InputSanitizer.clean(sku).toUpperCase();
     }
