@@ -6,6 +6,7 @@ import Categories from "./pages/Categories";
 import Suppliers from "./pages/Suppliers";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
+import Products from "./pages/Products";
 
 export default function App() {
     return (
@@ -14,6 +15,7 @@ export default function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
                 <Route path="/categories" element={<ProtectedRoute><AdminRoute><Categories /></AdminRoute></ProtectedRoute>} />
                 <Route path="/suppliers" element={<ProtectedRoute><AdminRoute><Suppliers /></AdminRoute></ProtectedRoute>} />
             </Routes>

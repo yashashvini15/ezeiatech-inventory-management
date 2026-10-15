@@ -46,6 +46,12 @@ public class ProductController {
                         minPrice,maxPrice,lowStock,sortBy,direction)));
     }
 
+    @PatchMapping("/{id}/activate")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<ApiResponse<ProductResponse>> activate(@PathVariable Long id){
+        return ResponseEntity.ok(ApiResponse.ok("Product activated", productService.activate(id)));
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<ProductResponse>> update(@PathVariable Long id,

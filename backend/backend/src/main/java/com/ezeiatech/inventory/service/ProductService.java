@@ -86,6 +86,13 @@ public class ProductService {
         return PageResponse.from(result.map(ProductResponse::from));
     }
 
+    @Transactional
+    public ProductResponse activate(Long id){
+        Product p = find(id);
+        p.setStatus(ProductStatus.ACTIVE);
+        return ProductResponse.from(p);
+    }
+
     private Product find(Long id){
         return productRepository.findById(id)
                 .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "Product not found"));
