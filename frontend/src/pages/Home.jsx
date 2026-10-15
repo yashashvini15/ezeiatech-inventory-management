@@ -28,6 +28,9 @@ export default function Home() {
                     <p>Email: {user.email}</p>
                     <p>Role: {user.role}</p>
                     <p>Status: {user.status}</p>
+                    {(user.role === "ADMIN" || user.role === "STAFF") && (
+                        <p><Link to="/products">Go to Products</Link></p>
+                    )}
                     <p>Joined: {new Date(user.createdAt).toLocaleString()}</p>
                     {user.role === "ADMIN" && (
                         <p>
