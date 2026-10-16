@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../store/slices/authSlice";
 
@@ -19,6 +19,7 @@ import {
     Chip,
     Divider,
     Button,
+    Fade,
     useMediaQuery,
     useTheme,
 } from "@mui/material";
@@ -30,6 +31,7 @@ import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import InventoryRoundedIcon from "@mui/icons-material/InventoryRounded";
+import HistoryRoundedIcon from "@mui/icons-material/HistoryRounded";
 
 const DRAWER_WIDTH = 260;
 
@@ -66,6 +68,12 @@ export default function DashboardLayout({ children }) {
             label: "Products",
             path: "/products",
             icon: <Inventory2RoundedIcon />,
+            allowed: role === "ADMIN" || role === "STAFF",
+        },
+        {
+            label: "Stock Movements",
+            path: "/inventory-history",
+            icon: <HistoryRoundedIcon />,
             allowed: role === "ADMIN" || role === "STAFF",
         },
         {
@@ -323,7 +331,7 @@ export default function DashboardLayout({ children }) {
                     maxWidth: "100%",
                 }}
             >
-                {children}
+                <Box>{children || <Outlet />}</Box>
             </Box>
         </Box>
     );

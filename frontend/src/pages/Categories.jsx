@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { getCategories, createCategory } from "../services/categoryService";
 import { toList } from "../utils/toList";
-import DashboardLayout from "../components/layout/DashboardLayout";
 
 import {
     Box,
@@ -98,7 +97,7 @@ export default function Categories() {
     );
 
     return (
-        <DashboardLayout>
+        <Box sx={{ pb: 3 }}>
             {/* Header */}
             <Box
                 sx={{
@@ -106,28 +105,30 @@ export default function Categories() {
                     justifyContent: "space-between",
                     alignItems: { xs: "flex-start", sm: "center" },
                     flexDirection: { xs: "column", sm: "row" },
-                    gap: 2,
-                    mb: 3.5,
+                    gap: 1.5,
+                    mb: 2.5,
                 }}
             >
                 <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: "text.primary" }}>
+                    <Typography variant="h5" sx={{ fontWeight: 600, color: "text.primary" }}>
                         Product Categories
                     </Typography>
-                    <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+                    <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.3, fontSize: "0.85rem" }}>
                         Structure and organize your inventory items into catalog groups
                     </Typography>
                 </Box>
                 <Button
                     variant="contained"
                     color="primary"
-                    startIcon={<AddRoundedIcon />}
+                    size="small"
+                    startIcon={<AddRoundedIcon sx={{ fontSize: 18 }} />}
                     onClick={handleOpenDialog}
                     sx={{
                         width: { xs: "100%", sm: "auto" },
-                        px: 2.5,
-                        py: 1.2,
-                        fontWeight: 700,
+                        px: 2,
+                        py: 0.8,
+                        fontWeight: 600,
+                        fontSize: "0.82rem",
                     }}
                 >
                     Add Category
@@ -157,30 +158,31 @@ export default function Categories() {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} sm={4} md={3}>
+                <Grid item xs={12} sm={5} md={3.5}>
                     <Paper
                         elevation={0}
                         sx={{
                             p: 1.2,
                             px: 2,
-                            borderRadius: 2.5,
+                            borderRadius: 2,
                             border: "1px solid",
                             borderColor: "divider",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "space-between",
+                            gap: 2,
                             height: "100%",
                             backgroundColor: "#FFFFFF",
                         }}
                     >
-                        <Typography variant="body2" sx={{ color: "text.secondary", fontWeight: 600 }}>
+                        <Typography variant="body2" sx={{ color: "text.secondary", fontWeight: 600, whiteSpace: "nowrap" }}>
                             Total Active
                         </Typography>
                         <Chip
                             label={`${categories.length} Groups`}
                             color="primary"
                             size="small"
-                            sx={{ fontWeight: 700 }}
+                            sx={{ fontWeight: 600, flexShrink: 0 }}
                         />
                     </Paper>
                 </Grid>
@@ -347,6 +349,6 @@ export default function Categories() {
                     </DialogActions>
                 </Box>
             </Dialog>
-        </DashboardLayout>
+        </Box>
     );
 }

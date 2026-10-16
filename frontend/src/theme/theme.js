@@ -4,49 +4,49 @@ export const theme = createTheme({
     palette: {
         mode: "light",
         primary: {
-            main: "#4F46E5",       // Sleek Indigo (NexaERP vibe)
-            light: "#818CF8",
-            dark: "#3730A3",
+            main: "#4338CA",       // Soft, classic Indigo (elegant, not harsh)
+            light: "#6366F1",
+            dark: "#312E81",
             contrastText: "#FFFFFF",
         },
         secondary: {
-            main: "#F59E0B",       // Warm Amber (Materio cozy vibe)
+            main: "#D97706",       // Muted warm Honey / Amber (soft cozy vibe)
             light: "#FDE68A",
-            dark: "#D97706",
+            dark: "#92400E",
             contrastText: "#FFFFFF",
         },
         background: {
-            default: "#F8FAFC",    // Soft, crisp off-white for less eye strain
+            default: "#F9FAFB",    // Extremely soft neutral canvas
             paper: "#FFFFFF",      // Clean white cards
         },
         text: {
-            primary: "#0F172A",    // Deep slate for sharp readability
-            secondary: "#64748B",  // Soft slate for subtitles & metadata
+            primary: "#1E293B",    // Refined slate (calm & readable, not harsh pitch black)
+            secondary: "#64748B",  // Soft slate for captions
         },
         success: {
-            main: "#10B981",
-            light: "#D1FAE5",
+            main: "#059669",
+            light: "#ECFDF5",
             dark: "#047857",
         },
         warning: {
-            main: "#F59E0B",
+            main: "#D97706",
             light: "#FEF3C7",
-            dark: "#B45309",
+            dark: "#92400E",
         },
         error: {
-            main: "#EF4444",
-            light: "#FEE2E2",
-            dark: "#B91C1C",
+            main: "#DC2626",
+            light: "#FEF2F2",
+            dark: "#991B1B",
         },
         info: {
-            main: "#3B82F6",
-            light: "#DBEAFE",
+            main: "#2563EB",
+            light: "#EFF6FF",
             dark: "#1D4ED8",
         },
-        divider: "#E2E8F0",
+        divider: "rgba(226, 232, 240, 0.8)",
     },
     shape: {
-        borderRadius: 12,          // Cozy rounded feel (Materio style)
+        borderRadius: 10,          // Balanced classic radius
     },
     typography: {
         fontFamily: [
@@ -58,33 +58,32 @@ export const theme = createTheme({
             "Arial",
             "sans-serif",
         ].join(","),
-        h1: { fontWeight: 700, letterSpacing: "-0.02em" },
-        h2: { fontWeight: 700, letterSpacing: "-0.01em" },
-        h3: { fontWeight: 600, letterSpacing: "-0.01em" },
-        h4: { fontWeight: 600 },
-        h5: { fontWeight: 600 },
-        h6: { fontWeight: 600 },
-        subtitle1: { color: "#64748B" },
-        subtitle2: { color: "#64748B" },
+        // Refined, calm sizes (no screaming fonts)
+        h1: { fontSize: "1.85rem", fontWeight: 600, letterSpacing: "-0.015em", color: "#1E293B" },
+        h2: { fontSize: "1.55rem", fontWeight: 600, letterSpacing: "-0.015em", color: "#1E293B" },
+        h3: { fontSize: "1.3rem", fontWeight: 600, letterSpacing: "-0.01em", color: "#1E293B" },
+        h4: { fontSize: "1.15rem", fontWeight: 600, letterSpacing: "-0.01em", color: "#1E293B" },
+        h5: { fontSize: "1.02rem", fontWeight: 600, letterSpacing: "-0.005em", color: "#1E293B" },
+        h6: { fontSize: "0.92rem", fontWeight: 600, color: "#1E293B" },
+        subtitle1: { fontSize: "0.9rem", color: "#64748B" },
+        subtitle2: { fontSize: "0.82rem", color: "#64748B" },
+        body1: { fontSize: "0.9rem", color: "#334155" },
+        body2: { fontSize: "0.83rem", color: "#64748B" },
         button: {
-            textTransform: "none", // Capitalize ALL CAPS ko hatata hai taaki modern lage
+            textTransform: "none",
             fontWeight: 600,
+            fontSize: "0.85rem",
         },
     },
     components: {
         MuiButton: {
             styleOverrides: {
                 root: {
-                    borderRadius: 10,
-                    padding: "8px 18px",
+                    borderRadius: 8,
+                    padding: "6px 14px",
                     boxShadow: "none",
                     "&:hover": {
-                        boxShadow: "0 4px 12px rgba(79, 70, 229, 0.15)",
-                    },
-                },
-                containedPrimary: {
-                    "&:hover": {
-                        backgroundColor: "#4338CA",
+                        boxShadow: "0 2px 6px rgba(67, 56, 202, 0.12)",
                     },
                 },
             },
@@ -92,12 +91,12 @@ export const theme = createTheme({
         MuiCard: {
             styleOverrides: {
                 root: {
-                    borderRadius: 16,
-                    border: "1px solid #E2E8F0",
-                    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)",
-                    transition: "all 0.2s ease-in-out",
+                    borderRadius: 12,
+                    border: "1px solid rgba(226, 232, 240, 0.8)",
+                    boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)",
+                    transition: "all 0.15s ease-in-out",
                     "&:hover": {
-                        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.04)",
+                        boxShadow: "0 4px 12px 0 rgba(0, 0, 0, 0.05)",
                     },
                 },
             },
@@ -106,7 +105,7 @@ export const theme = createTheme({
             styleOverrides: {
                 root: {
                     fontWeight: 600,
-                    borderRadius: 8,
+                    borderRadius: 6,
                 },
             },
         },
@@ -117,7 +116,7 @@ export const theme = createTheme({
             styleOverrides: {
                 root: {
                     "& .MuiOutlinedInput-root": {
-                        borderRadius: 10,
+                        borderRadius: 8,
                         backgroundColor: "#FFFFFF",
                     },
                 },

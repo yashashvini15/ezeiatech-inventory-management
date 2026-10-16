@@ -6,7 +6,8 @@ import { getCategories } from "../services/categoryService";
 import { getSuppliers } from "../services/supplierService";
 import { toList } from "../utils/toList";
 import ProductForm from "../components/ProductForm";
-import DashboardLayout from "../components/layout/DashboardLayout";
+import RestockDialog from "../components/RestockDialog";
+import { addStock } from "../services/inventoryService";
 import {
     getProducts,
     createProduct,
@@ -49,6 +50,7 @@ import BlockRoundedIcon from "@mui/icons-material/BlockRounded";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
+import AddBusinessRoundedIcon from "@mui/icons-material/AddBusinessRounded";
 
 const LIMIT = 10;
 const defaultFilters = {
@@ -77,6 +79,9 @@ export default function Products() {
     const [editing, setEditing] = useState(null);
     const [saving, setSaving] = useState(false);
     const [formError, setFormError] = useState("");
+
+    // Restock dialog state
+    const [restockProduct, setRestockProduct] = useState(null);
 
     const role = user?.role || "CUSTOMER";
     const isAdmin = role === "ADMIN";
@@ -188,6 +193,11 @@ export default function Products() {
         }
     };
 
+    const handleRestockSave = async (payload) => {
+        await addStock(payload);
+        setReloadKey((k) => k + 1);
+    };
+
     const handleDeactivate = async (p) => {
         if (!window.confirm(`Are you sure you want to deactivate "${p.name}"?`)) return;
         try {
@@ -209,11 +219,9 @@ export default function Products() {
 
     if (!canView) {
         return (
-            <DashboardLayout>
-                <Alert severity="error" sx={{ mt: 3, borderRadius: 3 }}>
-                    Access Denied. Only Admin and Staff are authorized to view and manage inventory products.
-                </Alert>
-            </DashboardLayout>
+            <Alert severity="error" sx={{ mt: 3, borderRadius: 2 }}>
+                Access Denied. Only Admin and Staff are authorized to view and manage inventory products.
+            </Alert>
         );
     }
 
@@ -221,7 +229,7 @@ export default function Products() {
     const totalPages = Math.max(1, data?.totalPages ?? 1);
 
     return (
-        <DashboardLayout>
+        <Box sx={{ pb: 3 }}>
             {/* Header Section */}
             <Box
                 sx={{
@@ -229,15 +237,15 @@ export default function Products() {
                     justifyContent: "space-between",
                     alignItems: { xs: "flex-start", sm: "center" },
                     flexDirection: { xs: "column", sm: "row" },
-                    gap: 2,
-                    mb: 3,
+                    gap: 1.5,
+                    mb: 2.5,
                 }}
             >
                 <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: "text.primary" }}>
+                    <Typography variant="h5" sx={{ fontWeight: 600, color: "text.primary" }}>
                         Inventory Products
                     </Typography>
-                    <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+                    <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.3, fontSize: "0.85rem" }}>
                         Manage product stock, categories, SKUs, and pricing
                     </Typography>
                 </Box>
@@ -245,9 +253,10 @@ export default function Products() {
                     <Button
                         variant="contained"
                         color="primary"
-                        startIcon={<AddRoundedIcon />}
+                        size="small"
+                        startIcon={<AddRoundedIcon sx={{ fontSize: 18 }} />}
                         onClick={openAdd}
-                        sx={{ px: 2.5, py: 1.2, fontWeight: 700 }}
+                        sx={{ px: 2, py: 0.8, fontWeight: 600, fontSize: "0.82rem" }}
                     >
                         Add Product
                     </Button>
@@ -515,6 +524,16 @@ export default function Products() {
                                         {isAdmin && (
                                             <TableCell align="right">
                                                 <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}>
+                                                    <Tooltip title="Restock / Add Stock">
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => setRestockProduct(p)}
+                                                            color="secondary"
+                                                        >
+                                                            <AddBusinessRoundedIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </Tooltip>
+
                                                     <Tooltip title="Edit Product">
                                                         <IconButton size="small" onClick={() => openEdit(p)} color="primary">
                                                             <EditRoundedIcon fontSize="small" />
@@ -591,6 +610,16 @@ export default function Products() {
                     onCancel={closeForm}
                 />
             )}
-        </DashboardLayout>
+
+            {/* Restock Inventory Dialog Modal */}
+            {isAdmin && (
+                <RestockDialog
+                    open={Boolean(restockProduct)}
+                    product={restockProduct}
+                    onClose={() => setRestockProduct(null)}
+                    onSuccess={handleRestockSave}
+                />
+            )}
+        </Box>
     );
 }

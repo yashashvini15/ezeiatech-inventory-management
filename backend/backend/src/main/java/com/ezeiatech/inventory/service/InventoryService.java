@@ -2,6 +2,7 @@ package com.ezeiatech.inventory.service;
 
 import com.ezeiatech.inventory.dto.AddStockRequest;
 import com.ezeiatech.inventory.dto.InventoryMovementResponse;
+import com.ezeiatech.inventory.dto.ProductResponse;
 import com.ezeiatech.inventory.entity.InventoryMovement;
 import com.ezeiatech.inventory.entity.MovementType;
 import com.ezeiatech.inventory.entity.Product;
@@ -14,6 +15,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +44,42 @@ public class InventoryService {
         InventoryMovement movement =
                 changeStock(product, MovementType.STOCK_IN, req.getQuantity(), null, user);
         return InventoryMovementResponse.from(movement);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<InventoryMovementResponse> getMovements(Long productId, MovementType type,
+                                                        LocalDate from, LocalDate to,
+                                                        Pageable pageable) {
+        if (from != null && to != null && from.isAfter(to)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "from must not be after to");
+        }
+
+        Specification<InventoryMovement> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (productId != null) {
+                predicates.add(cb.equal(root.get("product").get("id"), productId));
+            }
+            if (type != null) {
+                predicates.add(cb.equal(root.get("type"), type));
+            }
+            if (from != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"),
+                        from.atStartOfDay().toInstant(ZoneOffset.UTC)));
+            }
+            if (to != null) {
+                // to wali date ka poora din shamil: next din ke start se pehle tak
+                predicates.add(cb.lessThan(root.get("createdAt"),
+                        to.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC)));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return inventoryMovementRepository.findAll(spec, pageable).map(InventoryMovementResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductResponse> getLowStock(Pageable pageable) {
+        return productRepository.findLowStock(pageable).map(ProductResponse::from);
     }
 
     // Stock badalne ka EKLAUTA tareeka. Day 5 me order create/cancel bhi yahi use karenge.

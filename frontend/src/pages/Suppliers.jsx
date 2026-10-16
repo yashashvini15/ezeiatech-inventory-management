@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { getSuppliers, createSupplier, updateSupplier } from "../services/supplierService";
 import { toList } from "../utils/toList";
-import DashboardLayout from "../components/layout/DashboardLayout";
 
 import {
     Box,
@@ -141,7 +140,7 @@ export default function Suppliers() {
     );
 
     return (
-        <DashboardLayout>
+        <Box sx={{ pb: 3 }}>
             {/* Header */}
             <Box
                 sx={{
@@ -149,28 +148,30 @@ export default function Suppliers() {
                     justifyContent: "space-between",
                     alignItems: { xs: "flex-start", sm: "center" },
                     flexDirection: { xs: "column", sm: "row" },
-                    gap: 2,
-                    mb: 3.5,
+                    gap: 1.5,
+                    mb: 2.5,
                 }}
             >
                 <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: "text.primary" }}>
+                    <Typography variant="h5" sx={{ fontWeight: 600, color: "text.primary" }}>
                         Supplier Directory
                     </Typography>
-                    <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+                    <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.3, fontSize: "0.85rem" }}>
                         Manage vendor relationships, supply points, and contact channels
                     </Typography>
                 </Box>
                 <Button
                     variant="contained"
                     color="primary"
-                    startIcon={<AddRoundedIcon />}
+                    size="small"
+                    startIcon={<AddRoundedIcon sx={{ fontSize: 18 }} />}
                     onClick={handleOpenAdd}
                     sx={{
                         width: { xs: "100%", sm: "auto" },
-                        px: 2.5,
-                        py: 1.2,
-                        fontWeight: 700,
+                        px: 2,
+                        py: 0.8,
+                        fontWeight: 600,
+                        fontSize: "0.82rem",
                     }}
                 >
                     Add Supplier
@@ -200,30 +201,31 @@ export default function Suppliers() {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} sm={4} md={3}>
+                <Grid item xs={12} sm={5} md={3.5}>
                     <Paper
                         elevation={0}
                         sx={{
                             p: 1.2,
                             px: 2,
-                            borderRadius: 2.5,
+                            borderRadius: 2,
                             border: "1px solid",
                             borderColor: "divider",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "space-between",
+                            gap: 2,
                             height: "100%",
                             backgroundColor: "#FFFFFF",
                         }}
                     >
-                        <Typography variant="body2" sx={{ color: "text.secondary", fontWeight: 600 }}>
+                        <Typography variant="body2" sx={{ color: "text.secondary", fontWeight: 600, whiteSpace: "nowrap" }}>
                             Total Suppliers
                         </Typography>
                         <Chip
                             label={`${suppliers.length} Vendors`}
                             color="info"
                             size="small"
-                            sx={{ fontWeight: 700 }}
+                            sx={{ fontWeight: 600, flexShrink: 0 }}
                         />
                     </Paper>
                 </Grid>
@@ -457,6 +459,6 @@ export default function Suppliers() {
                     </DialogActions>
                 </Box>
             </Dialog>
-        </DashboardLayout>
+        </Box>
     );
 }
