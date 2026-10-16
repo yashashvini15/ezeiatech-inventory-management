@@ -1,24 +1,79 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    MenuItem,
+    Grid,
+    Button,
+    Alert,
+    CircularProgress,
+    Box,
+    IconButton,
+    Typography,
+} from "@mui/material";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
-export default function ProductForm({ initial, categories, suppliers, saving, error, onSave, onCancel }) {
+export default function ProductForm({
+    open,
+    initial,
+    categories = [],
+    suppliers = [],
+    saving = false,
+    error = "",
+    onSave,
+    onCancel,
+}) {
     const isEdit = Boolean(initial);
+
     const [form, setForm] = useState({
-        name: initial?.name ?? "",
-        sku: initial?.sku ?? "",
-        description: initial?.description ?? "",
-        categoryId: initial?.categoryId ?? "",
-        supplierId: initial?.supplierId ?? "",
-        price: initial?.price ?? "",
-        costPrice: initial?.costPrice ?? "",
-        stock: initial?.stock ?? 0,
-        reorderLevel: initial?.reorderLevel ?? 0,
+        name: "",
+        sku: "",
+        description: "",
+        categoryId: "",
+        supplierId: "",
+        price: "",
+        costPrice: "",
+        stock: 0,
+        reorderLevel: 0,
     });
 
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+    useEffect(() => {
+        if (initial) {
+            setForm({
+                name: initial.name ?? "",
+                sku: initial.sku ?? "",
+                description: initial.description ?? "",
+                categoryId: initial.categoryId ?? "",
+                supplierId: initial.supplierId ?? "",
+                price: initial.price ?? "",
+                costPrice: initial.costPrice ?? "",
+                stock: initial.stock ?? 0,
+                reorderLevel: initial.reorderLevel ?? 0,
+            });
+        } else {
+            setForm({
+                name: "",
+                sku: "",
+                description: "",
+                categoryId: "",
+                supplierId: "",
+                price: "",
+                costPrice: "",
+                stock: 0,
+                reorderLevel: 0,
+            });
+        }
+    }, [initial, open]);
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // input se sab string aata hai, backend ko numbers chahiye
         onSave({
             name: form.name.trim(),
             sku: form.sku.trim(),
@@ -32,54 +87,190 @@ export default function ProductForm({ initial, categories, suppliers, saving, er
         });
     };
 
-    const field = { display: "block", marginBottom: 10 };
-
     return (
-        <form onSubmit={handleSubmit} style={{ border: "1px solid #ccc", padding: 16, marginBottom: 20, maxWidth: 420 }}>
-            <h3>{isEdit ? "Edit Product" : "Add Product"}</h3>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+        <Dialog
+            open={open}
+            onClose={saving ? undefined : onCancel}
+            maxWidth="sm"
+            fullWidth
+            PaperProps={{
+                sx: { borderRadius: 3.5, p: 1 },
+            }}
+        >
+            <DialogTitle sx={{ m: 0, p: 2.5, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                        {isEdit ? "Edit Product" : "Add New Product"}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                        {isEdit ? "Update inventory specifications & pricing" : "Create a new catalog item"}
+                    </Typography>
+                </Box>
+                <IconButton
+                    aria-label="close"
+                    onClick={onCancel}
+                    disabled={saving}
+                    size="small"
+                    sx={{ color: "text.secondary" }}
+                >
+                    <CloseRoundedIcon />
+                </IconButton>
+            </DialogTitle>
 
-            <label style={field}>Name
-                <input name="name" value={form.name} onChange={handleChange} required maxLength={150} />
-            </label>
-            <label style={field}>SKU
-                <input name="sku" value={form.sku} onChange={handleChange} required maxLength={50}
-                       pattern="[A-Za-z0-9_\-]+" title="Only letters, digits, - and _" />
-            </label>
-            <label style={field}>Description
-                <input name="description" value={form.description} onChange={handleChange} maxLength={1000} />
-            </label>
-            <label style={field}>Category
-                <select name="categoryId" value={form.categoryId} onChange={handleChange} required>
-                    <option value="">Select</option>
-                    {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-            </label>
-            <label style={field}>Supplier
-                <select name="supplierId" value={form.supplierId} onChange={handleChange} required>
-                    <option value="">Select</option>
-                    {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-                </select>
-            </label>
-            <label style={field}>Selling price
-                <input name="price" type="number" min="0.01" step="0.01" value={form.price}
-                       onChange={handleChange} required />
-            </label>
-            <label style={field}>Cost price
-                <input name="costPrice" type="number" min="0" step="0.01" value={form.costPrice}
-                       onChange={handleChange} required />
-            </label>
-            <label style={field}>Stock {isEdit && "(Inventory page se badlega)"}
-                <input name="stock" type="number" min="0" step="1" value={form.stock}
-                       onChange={handleChange} required disabled={isEdit} />
-            </label>
-            <label style={field}>Reorder level
-                <input name="reorderLevel" type="number" min="0" step="1" value={form.reorderLevel}
-                       onChange={handleChange} required />
-            </label>
+            <Box component="form" onSubmit={handleSubmit}>
+                <DialogContent dividers sx={{ p: 3 }}>
+                    {error && (
+                        <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
+                            {error}
+                        </Alert>
+                    )}
 
-            <button type="submit" disabled={saving}>{saving ? "Saving..." : "Save"}</button>{" "}
-            <button type="button" onClick={onCancel} disabled={saving}>Cancel</button>
-        </form>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={8}>
+                            <TextField
+                                fullWidth
+                                label="Product Name"
+                                name="name"
+                                value={form.name}
+                                onChange={handleChange}
+                                required
+                                inputProps={{ maxLength: 150 }}
+                                placeholder="e.g. Wireless Ergonomic Mouse"
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                fullWidth
+                                label="SKU Code"
+                                name="sku"
+                                value={form.sku}
+                                onChange={handleChange}
+                                required
+                                inputProps={{ maxLength: 50, pattern: "[A-Za-z0-9_\\-]+" }}
+                                helperText="Letters, digits, -, _"
+                                placeholder="e.g. PROD-101"
+                            />
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                select
+                                fullWidth
+                                label="Category"
+                                name="categoryId"
+                                value={form.categoryId}
+                                onChange={handleChange}
+                                required
+                            >
+                                <MenuItem value="">
+                                    <em>Select Category</em>
+                                </MenuItem>
+                                {categories.map((c) => (
+                                    <MenuItem key={c.id} value={c.id}>
+                                        {c.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                select
+                                fullWidth
+                                label="Supplier"
+                                name="supplierId"
+                                value={form.supplierId}
+                                onChange={handleChange}
+                                required
+                            >
+                                <MenuItem value="">
+                                    <em>Select Supplier</em>
+                                </MenuItem>
+                                {suppliers.map((s) => (
+                                    <MenuItem key={s.id} value={s.id}>
+                                        {s.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                label="Description"
+                                name="description"
+                                value={form.description}
+                                onChange={handleChange}
+                                inputProps={{ maxLength: 1000 }}
+                                placeholder="Short item description or specs..."
+                            />
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Selling Price (₹)"
+                                name="price"
+                                type="number"
+                                inputProps={{ min: "0.01", step: "0.01" }}
+                                value={form.price}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Cost Price (₹)"
+                                name="costPrice"
+                                type="number"
+                                inputProps={{ min: "0", step: "0.01" }}
+                                value={form.costPrice}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label={isEdit ? "Initial Stock (Locked)" : "Initial Stock"}
+                                name="stock"
+                                type="number"
+                                inputProps={{ min: "0", step: "1" }}
+                                value={form.stock}
+                                onChange={handleChange}
+                                required
+                                disabled={isEdit}
+                                helperText={isEdit ? "Stock locked in edit mode" : "Starting quantity"}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Reorder Level Threshold"
+                                name="reorderLevel"
+                                type="number"
+                                inputProps={{ min: "0", step: "1" }}
+                                value={form.reorderLevel}
+                                onChange={handleChange}
+                                required
+                                helperText="Alert triggered below this level"
+                            />
+                        </Grid>
+                    </Grid>
+                </DialogContent>
+
+                <DialogActions sx={{ px: 3, py: 2 }}>
+                    <Button variant="outlined" color="inherit" onClick={onCancel} disabled={saving}>
+                        Cancel
+                    </Button>
+                    <Button type="submit" variant="contained" color="primary" disabled={saving} sx={{ minWidth: 100 }}>
+                        {saving ? <CircularProgress size={20} color="inherit" /> : isEdit ? "Save Changes" : "Create Product"}
+                    </Button>
+                </DialogActions>
+            </Box>
+        </Dialog>
     );
 }
