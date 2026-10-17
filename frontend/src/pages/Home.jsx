@@ -21,6 +21,7 @@ import {
     LinearProgress,
     Skeleton,
     Paper,
+    CircularProgress,
 } from "@mui/material";
 
 import Inventory2RoundedIcon from "@mui/icons-material/Inventory2Rounded";
@@ -272,6 +273,10 @@ export default function Home() {
                         </Grid>
                     ))}
                 </Grid>
+            ) : loading ? (
+                <Box sx={{ p: 3, display: "flex", justifyContent: "center" }}>
+                    <CircularProgress size={28} />
+                </Box>
             ) : (
                 <Paper sx={{ p: 2.5, mb: 3, borderRadius: 2 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
@@ -408,6 +413,29 @@ export default function Home() {
 
                                     {isAdmin && (
                                         <>
+                                            <Button
+                                                variant="outlined"
+                                                color="inherit"
+                                                fullWidth
+                                                size="small"
+                                                endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: 16 }} />}
+                                                onClick={() => navigate("/inventory-history")}
+                                                sx={{
+                                                    justifyContent: "space-between",
+                                                    py: 0.9,
+                                                    px: 1.5,
+                                                    borderColor: "divider",
+                                                    "&:hover": { borderColor: "success.main", color: "success.main" },
+                                                }}
+                                            >
+                                                <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
+                                                    <TrendingUpRoundedIcon color="success" sx={{ fontSize: 18 }} />
+                                                    <Typography variant="body2" sx={{ fontWeight: 500, fontSize: "0.85rem" }}>
+                                                        Stock Movements & Audit
+                                                    </Typography>
+                                                </Box>
+                                            </Button>
+
                                             <Button
                                                 variant="outlined"
                                                 color="inherit"

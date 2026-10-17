@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../../store/slices/authSlice";
+import { logout, setUser } from "../../store/slices/authSlice";
+import { getMe } from "../../services/authService";
 
 import {
     Box,
@@ -44,8 +45,24 @@ export default function DashboardLayout({ children }) {
     const location = useLocation();
     const dispatch = useDispatch();
 
-    const { user } = useSelector((state) => state.auth);
-    const role = user?.role || "CUSTOMER";
+    const { user, token } = useSelector((state) => state.auth);
+
+    // Jab tak user load na ho, tab tak null check rakhein taaki wrong role na dikhe
+    useEffect(() => {
+        if (token && !user) {
+            getMe()
+                .then((res) => {
+                    if (res.data?.data) {
+                        dispatch(setUser(res.data.data));
+                    }
+                })
+                .catch((err) => {
+                    console.error("DashboardLayout profile sync error", err);
+                });
+        }
+    }, [token, user, dispatch]);
+
+    const role = user?.role || (user === null ? "" : "CUSTOMER");
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -199,23 +216,25 @@ export default function DashboardLayout({ children }) {
                             fontSize: "0.95rem",
                         }}
                     >
-                        {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                        {user?.name ? user.name.charAt(0).toUpperCase() : "A"}
                     </Avatar>
-                    <Box sx={{ overflow: "hidden" }}>
+                    <Box sx={{ overflow: "hidden", flex: 1 }}>
                         <Typography variant="body2" sx={{ fontWeight: 700, noWrap: true, color: "text.primary" }}>
-                            {user?.name || "Inventory User"}
+                            {user?.name || "Administrator"}
                         </Typography>
-                        <Chip
-                            label={role}
-                            size="small"
-                            color={role === "ADMIN" ? "secondary" : "primary"}
-                            sx={{
-                                height: 20,
-                                fontSize: "0.68rem",
-                                fontWeight: 700,
-                                px: 0.5,
-                            }}
-                        />
+                        {role ? (
+                            <Chip
+                                label={role}
+                                size="small"
+                                color={role === "ADMIN" ? "secondary" : "primary"}
+                                sx={{
+                                    height: 20,
+                                    fontSize: "0.68rem",
+                                    fontWeight: 700,
+                                    px: 0.5,
+                                }}
+                            />
+                        ) : null}
                     </Box>
                 </Box>
                 <Button
@@ -276,7 +295,7 @@ export default function DashboardLayout({ children }) {
 
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                         <Chip
-                            label={`Logged in as ${user?.name || "User"}`}
+                            label={user?.name ? `${user.name} (${user.role || "Admin"})` : "Admin"}
                             variant="outlined"
                             size="small"
                             sx={{ borderColor: "divider", fontWeight: 500, display: { xs: "none", sm: "flex" } }}

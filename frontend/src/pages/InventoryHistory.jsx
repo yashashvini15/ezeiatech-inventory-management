@@ -177,7 +177,17 @@ export default function InventoryHistory() {
                                 setPage(0);
                             }}
                             InputLabelProps={{ shrink: true }}
-                            sx={{ minWidth: 140 }}
+                            sx={{
+                                minWidth: 160,
+                                "& .MuiInputLabel-root": {
+                                    backgroundColor: "#FFFFFF",
+                                    px: 0.6,
+                                    zIndex: 1,
+                                },
+                                "& input[type='date']": {
+                                    minHeight: "1.4375em",
+                                },
+                            }}
                         />
 
                         <TextField
@@ -190,7 +200,17 @@ export default function InventoryHistory() {
                                 setPage(0);
                             }}
                             InputLabelProps={{ shrink: true }}
-                            sx={{ minWidth: 140 }}
+                            sx={{
+                                minWidth: 160,
+                                "& .MuiInputLabel-root": {
+                                    backgroundColor: "#FFFFFF",
+                                    px: 0.6,
+                                    zIndex: 1,
+                                },
+                                "& input[type='date']": {
+                                    minHeight: "1.4375em",
+                                },
+                            }}
                         />
                     </Stack>
                 </CardContent>
