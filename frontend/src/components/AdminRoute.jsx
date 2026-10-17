@@ -1,17 +1,45 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { setUser } from "../store/slices/authSlice";
 import { getMe } from "../services/authService";
+import { Box, CircularProgress } from "@mui/material";
 
 export default function AdminRoute({ children }) {
-    const [state, setState] = useState("loading");
+    const dispatch = useDispatch();
+    const { user } = useSelector((state) => state.auth);
+
+    // If user is already loaded in Redux, no delay at all!
+    const isAdmin = user?.role === "ADMIN";
+    const [loading, setLoading] = useState(!user);
 
     useEffect(() => {
-        getMe()
-            .then((res) => setState(res.data.data.role === "ADMIN" ? "ok" : "denied"))
-            .catch(() => setState("denied"));
-    }, []);
+        if (!user) {
+            getMe()
+                .then((res) => {
+                    dispatch(setUser(res.data.data));
+                })
+                .catch(() => {})
+                .finally(() => setLoading(false));
+        }
+    }, [user, dispatch]);
 
-    if (state === "loading") return <p>Loading...</p>;
-    if (state === "denied") return <Navigate to="/" replace />;
-    return children;
+    // Fast path: if user in Redux is already admin, render instantly without intermediate state!
+    if (isAdmin) {
+        return children ? children : <Outlet />;
+    }
+
+    if (loading) {
+        return (
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
+                <CircularProgress size={28} color="primary" />
+            </Box>
+        );
+    }
+
+    if (!user || user.role !== "ADMIN") {
+        return <Navigate to="/" replace />;
+    }
+
+    return children ? children : <Outlet />;
 }
