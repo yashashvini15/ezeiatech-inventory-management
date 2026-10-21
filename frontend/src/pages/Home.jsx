@@ -9,6 +9,7 @@ import { getSuppliers } from "../services/supplierService";
 import { toList } from "../utils/toList";
 
 import { clearCart } from "../store/cartSlice";
+import LowStockAlert from "../components/LowStockAlert";
 
 import {
     Box,
@@ -36,6 +37,7 @@ import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
 import ShoppingBagRoundedIcon from "@mui/icons-material/ShoppingBagRounded";
 import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
+import NotificationsActiveRoundedIcon from "@mui/icons-material/NotificationsActiveRounded";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -158,6 +160,9 @@ export default function Home() {
 
     return (
         <Box sx={{ pb: 3 }}>
+            {/* Low-Stock and Restock-Request Banner */}
+            <LowStockAlert />
+
             {/* Elegant Header (Calm, Not Loud) */}
             <Box
                 sx={{
@@ -441,6 +446,29 @@ export default function Home() {
                                             <ReceiptLongRoundedIcon color="primary" sx={{ fontSize: 18 }} />
                                             <Typography variant="body2" sx={{ fontWeight: 500, fontSize: "0.85rem" }}>
                                                 Manage Orders
+                                            </Typography>
+                                        </Box>
+                                    </Button>
+
+                                    <Button
+                                        variant="outlined"
+                                        color="inherit"
+                                        fullWidth
+                                        size="small"
+                                        endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: 16 }} />}
+                                        onClick={() => navigate("/restock-requests")}
+                                        sx={{
+                                            justifyContent: "space-between",
+                                            py: 0.9,
+                                            px: 1.5,
+                                            borderColor: "divider",
+                                            "&:hover": { borderColor: "warning.main", color: "warning.main" },
+                                        }}
+                                    >
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
+                                            <NotificationsActiveRoundedIcon color="warning" sx={{ fontSize: 18 }} />
+                                            <Typography variant="body2" sx={{ fontWeight: 500, fontSize: "0.85rem" }}>
+                                                Restock Requests
                                             </Typography>
                                         </Box>
                                     </Button>
