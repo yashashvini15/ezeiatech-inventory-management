@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../store/slices/authSlice";
-import { login } from "../services/authService";
+import { login, getMe } from "../services/authService";
 
 import {
     Box,
@@ -58,7 +58,20 @@ export default function Login() {
                 })
             );
 
-            navigate("/");
+            // Fetch profile to verify role and redirect appropriately
+            let userRole = authData.user?.role;
+            try {
+                const meRes = await getMe();
+                userRole = meRes.data?.data?.role || userRole;
+            } catch {
+                // If getMe fails, fallback to userRole
+            }
+
+            if (userRole === "CUSTOMER") {
+                navigate("/shop");
+            } else {
+                navigate("/");
+            }
         } catch (err) {
             // Backend ApiResponse: { success: false, message: "...", data: null }
             if (!err.response) {

@@ -176,7 +176,7 @@ export default function InventoryHistory() {
                                 setFromDate(e.target.value);
                                 setPage(0);
                             }}
-                            InputLabelProps={{ shrink: true }}
+                            slotProps={{ inputLabel: { shrink: true } }}
                             sx={{
                                 minWidth: 160,
                                 "& .MuiInputLabel-root": {
@@ -199,7 +199,7 @@ export default function InventoryHistory() {
                                 setToDate(e.target.value);
                                 setPage(0);
                             }}
-                            InputLabelProps={{ shrink: true }}
+                            slotProps={{ inputLabel: { shrink: true } }}
                             sx={{
                                 minWidth: 160,
                                 "& .MuiInputLabel-root": {
