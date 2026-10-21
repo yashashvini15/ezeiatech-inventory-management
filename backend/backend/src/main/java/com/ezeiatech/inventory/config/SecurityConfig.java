@@ -43,7 +43,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/suppliers/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/products/*").hasRole("ADMIN")
-                        // naye:
+                        .requestMatchers(HttpMethod.PATCH, "/api/restock-requests/*/dismiss").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/restock-requests").hasRole("STAFF")
                         .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.PATCH, "/api/orders/*/status").hasAnyRole("ADMIN", "STAFF")
                         .anyRequest().authenticated())
