@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
+import org.hibernate.annotations.BatchSize;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -42,6 +42,7 @@ public class Order {
     //   Yahi line batati hai ki alag join table mat banao.
     // cascade = ALL: order save/delete karo to items bhi apne aap save/delete.
     // orphanRemoval = true: list se item hata do to DB se bhi delete.
+    @BatchSize(size = 50)   // 10 orders ke items ek hi query me aayein (N+1 nahi)
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 

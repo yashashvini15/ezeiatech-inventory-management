@@ -1,5 +1,6 @@
 package com.ezeiatech.inventory.service;
 
+import com.ezeiatech.inventory.dto.CatalogProductResponse;
 import com.ezeiatech.inventory.dto.PageResponse;
 import com.ezeiatech.inventory.dto.ProductRequest;
 import com.ezeiatech.inventory.dto.ProductResponse;
@@ -91,6 +92,34 @@ public class ProductService {
         Product p = find(id);
         p.setStatus(ProductStatus.ACTIVE);
         return ProductResponse.from(p);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<CatalogProductResponse> catalog(int page, int limit, String search, Long categoryId,
+                                                        BigDecimal minPrice, BigDecimal maxPrice,
+                                                        String sortBy, String direction) {
+        if (page < 1) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "page must be 1 or more");
+        }
+        if (limit < 1 || limit > 100) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "limit must be between 1 and 100");
+        }
+        if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "minPrice cannot be greater than maxPrice");
+        }
+        Pageable pageable = PageRequest.of(page - 1, limit, buildSort(sortBy, direction));
+        // status hamesha ACTIVE (customer se status param nahi lete)
+        Specification<Product> spec = ProductSpecs.filter(search, categoryId, ProductStatus.ACTIVE, minPrice, maxPrice, null);
+        return PageResponse.from(productRepository.findAll(spec, pageable).map(CatalogProductResponse::from));
+    }
+
+    @Transactional(readOnly = true)
+    public CatalogProductResponse catalogGet(Long id) {
+        Product p = find(id);
+        if (p.getStatus() != ProductStatus.ACTIVE) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "Product not found");
+        }
+        return CatalogProductResponse.from(p);
     }
 
     private Product find(Long id){

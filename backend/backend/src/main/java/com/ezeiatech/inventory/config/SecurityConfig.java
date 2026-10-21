@@ -41,6 +41,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
                         .requestMatchers("/api/suppliers/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/products/*").hasRole("ADMIN")
+                        // naye:
+                        .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/orders/*/status").hasAnyRole("ADMIN", "STAFF")
                         .anyRequest().authenticated())
                 .exceptionHandling(e->e
                         .authenticationEntryPoint((req,res,ex) -> writeError(res,401,"Authentication required"))
