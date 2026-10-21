@@ -33,6 +33,11 @@ import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import InventoryRoundedIcon from "@mui/icons-material/InventoryRounded";
 import HistoryRoundedIcon from "@mui/icons-material/HistoryRounded";
+import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
+import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
+import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
+import Badge from "@mui/material/Badge";
+import { selectCartCount, clearCart } from "../../store/cartSlice";
 
 const DRAWER_WIDTH = 260;
 
@@ -46,6 +51,7 @@ export default function DashboardLayout({ children }) {
     const dispatch = useDispatch();
 
     const { user, token } = useSelector((state) => state.auth);
+    const cartCount = useSelector(selectCartCount);
 
     // Jab tak user load na ho, tab tak null check rakhein taaki wrong role na dikhe
     useEffect(() => {
@@ -69,6 +75,7 @@ export default function DashboardLayout({ children }) {
     };
 
     const handleLogout = () => {
+        dispatch(clearCart());
         dispatch(logout());
         navigate("/login");
     };
@@ -80,6 +87,34 @@ export default function DashboardLayout({ children }) {
             path: "/",
             icon: <DashboardRoundedIcon />,
             allowed: true, // Everyone can see dashboard
+        },
+        {
+            label: "Shop Products",
+            path: "/shop",
+            icon: <StorefrontRoundedIcon />,
+            allowed: role === "CUSTOMER",
+        },
+        {
+            label: "Shopping Cart",
+            path: "/cart",
+            icon: (
+                <Badge badgeContent={cartCount} color="primary">
+                    <ShoppingCartRoundedIcon />
+                </Badge>
+            ),
+            allowed: role === "CUSTOMER",
+        },
+        {
+            label: "My Orders",
+            path: "/orders",
+            icon: <ReceiptLongRoundedIcon />,
+            allowed: role === "CUSTOMER",
+        },
+        {
+            label: "Manage Orders",
+            path: "/manage/orders",
+            icon: <ReceiptLongRoundedIcon />,
+            allowed: role === "ADMIN" || role === "STAFF",
         },
         {
             label: "Products",

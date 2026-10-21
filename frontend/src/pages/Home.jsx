@@ -8,6 +8,8 @@ import { getCategories } from "../services/categoryService";
 import { getSuppliers } from "../services/supplierService";
 import { toList } from "../utils/toList";
 
+import { clearCart } from "../store/cartSlice";
+
 import {
     Box,
     Grid,
@@ -31,6 +33,9 @@ import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
+import ShoppingBagRoundedIcon from "@mui/icons-material/ShoppingBagRounded";
+import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
+import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -278,13 +283,42 @@ export default function Home() {
                     <CircularProgress size={28} />
                 </Box>
             ) : (
-                <Paper sx={{ p: 2.5, mb: 3, borderRadius: 2 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
+                <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
                         Customer Portal
                     </Typography>
-                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                        You are logged in as a registered customer. Administrative inventory controls are reserved for staff and admins.
+                    <Typography variant="body2" sx={{ color: "text.secondary", mb: 3 }}>
+                        Welcome to our online store! Browse our catalog, manage your shopping cart, and view your orders.
                     </Typography>
+                    <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<ShoppingBagRoundedIcon />}
+                            onClick={() => navigate("/shop")}
+                            sx={{ fontWeight: 600 }}
+                        >
+                            Explore Shop
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            startIcon={<ShoppingCartRoundedIcon />}
+                            onClick={() => navigate("/cart")}
+                            sx={{ fontWeight: 600 }}
+                        >
+                            View Cart
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="inherit"
+                            startIcon={<ReceiptLongRoundedIcon />}
+                            onClick={() => navigate("/orders")}
+                            sx={{ fontWeight: 600 }}
+                        >
+                            My Orders
+                        </Button>
+                    </Box>
                 </Paper>
             )}
 
@@ -388,6 +422,29 @@ export default function Home() {
                                 </Typography>
 
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2 }}>
+                                    <Button
+                                        variant="outlined"
+                                        color="inherit"
+                                        fullWidth
+                                        size="small"
+                                        endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: 16 }} />}
+                                        onClick={() => navigate("/manage/orders")}
+                                        sx={{
+                                            justifyContent: "space-between",
+                                            py: 0.9,
+                                            px: 1.5,
+                                            borderColor: "divider",
+                                            "&:hover": { borderColor: "primary.main", color: "primary.main" },
+                                        }}
+                                    >
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
+                                            <ReceiptLongRoundedIcon color="primary" sx={{ fontSize: 18 }} />
+                                            <Typography variant="body2" sx={{ fontWeight: 500, fontSize: "0.85rem" }}>
+                                                Manage Orders
+                                            </Typography>
+                                        </Box>
+                                    </Button>
+
                                     <Button
                                         variant="outlined"
                                         color="inherit"
