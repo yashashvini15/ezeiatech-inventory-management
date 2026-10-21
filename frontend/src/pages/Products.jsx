@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { setUser } from "../store/slices/authSlice";
 import { getMe } from "../services/authService";
@@ -7,6 +8,8 @@ import { getSuppliers } from "../services/supplierService";
 import { toList } from "../utils/toList";
 import ProductForm from "../components/ProductForm";
 import RestockDialog from "../components/RestockDialog";
+import RequestRestockDialog from "../components/RequestRestockDialog";
+import LowStockAlert from "../components/LowStockAlert";
 import { addStock } from "../services/inventoryService";
 import {
     getProducts,
@@ -51,6 +54,7 @@ import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlin
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import AddBusinessRoundedIcon from "@mui/icons-material/AddBusinessRounded";
+import SendRoundedIcon from "@mui/icons-material/SendRounded";
 
 const LIMIT = 10;
 const defaultFilters = {
@@ -64,6 +68,8 @@ const defaultFilters = {
 export default function Products() {
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
+    const [searchParams] = useSearchParams();
+    const initialLowStock = searchParams.get("lowStock") === "true";
 
     const [categories, setCategories] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
@@ -71,8 +77,19 @@ export default function Products() {
     const [page, setPage] = useState(1);
     const [searchInput, setSearchInput] = useState("");
     const [search, setSearch] = useState("");
-    const [filters, setFilters] = useState(defaultFilters);
+    const [filters, setFilters] = useState({
+        ...defaultFilters,
+        lowStock: initialLowStock,
+    });
     const [reloadKey, setReloadKey] = useState(0);
+
+    // Sync lowStock param if navigated while already on Products page
+    useEffect(() => {
+        const queryLowStock = searchParams.get("lowStock") === "true";
+        if (queryLowStock) {
+            setFilters((prev) => ({ ...prev, lowStock: true }));
+        }
+    }, [searchParams]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [formOpen, setFormOpen] = useState(false);
@@ -82,10 +99,12 @@ export default function Products() {
 
     // Restock dialog state
     const [restockProduct, setRestockProduct] = useState(null);
+    const [staffRequestProduct, setStaffRequestProduct] = useState(null);
 
     const role = user?.role || "CUSTOMER";
     const isAdmin = role === "ADMIN";
-    const canView = isAdmin || role === "STAFF";
+    const isStaff = role === "STAFF";
+    const canView = isAdmin || isStaff;
 
     // 1. Load user role & sync Redux if needed
     useEffect(() => {
@@ -230,6 +249,9 @@ export default function Products() {
 
     return (
         <Box sx={{ pb: 3 }}>
+            {/* Low-Stock and Restock-Request Banner */}
+            <LowStockAlert />
+
             {/* Header Section */}
             <Box
                 sx={{
@@ -387,8 +409,8 @@ export default function Products() {
                             <TableCell align="center" sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.82rem", py: 1.5, px: 1.5 }}>
                                 STATUS
                             </TableCell>
-                            {isAdmin && (
-                                <TableCell align="right" sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.82rem", py: 1.5, px: 2, width: 100 }}>
+                            {canView && (
+                                <TableCell align="right" sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.82rem", py: 1.5, px: 2, width: isAdmin ? 140 : 120 }}>
                                     ACTIONS
                                 </TableCell>
                             )}
@@ -397,7 +419,7 @@ export default function Products() {
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={isAdmin ? 8 : 7} align="center" sx={{ py: 6 }}>
+                                <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
                                     <CircularProgress size={32} color="primary" />
                                     <Typography variant="body2" sx={{ color: "text.secondary", mt: 1.5 }}>
                                         Loading inventory catalog...
@@ -406,7 +428,7 @@ export default function Products() {
                             </TableRow>
                         ) : products.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={isAdmin ? 8 : 7} align="center" sx={{ py: 6 }}>
+                                <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
                                     <Inventory2OutlinedIcon sx={{ fontSize: 48, color: "text.secondary", mb: 1, opacity: 0.5 }} />
                                     <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                                         No products found
@@ -521,44 +543,73 @@ export default function Products() {
                                             />
                                         </TableCell>
 
-                                        {isAdmin && (
+                                        {canView && (
                                             <TableCell align="right">
                                                 <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}>
-                                                    <Tooltip title="Restock / Add Stock">
-                                                        <IconButton
-                                                            size="small"
-                                                            onClick={() => setRestockProduct(p)}
-                                                            color="secondary"
-                                                        >
-                                                            <AddBusinessRoundedIcon fontSize="small" />
-                                                        </IconButton>
-                                                    </Tooltip>
+                                                    {/* Admin Controls */}
+                                                    {isAdmin && (
+                                                        <>
+                                                            <Tooltip title="Restock / Add Stock">
+                                                                <IconButton
+                                                                    size="small"
+                                                                    onClick={() => setRestockProduct(p)}
+                                                                    color="secondary"
+                                                                >
+                                                                    <AddBusinessRoundedIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
 
-                                                    <Tooltip title="Edit Product">
-                                                        <IconButton size="small" onClick={() => openEdit(p)} color="primary">
-                                                            <EditRoundedIcon fontSize="small" />
-                                                        </IconButton>
-                                                    </Tooltip>
+                                                            <Tooltip title="Edit Product">
+                                                                <IconButton size="small" onClick={() => openEdit(p)} color="primary">
+                                                                    <EditRoundedIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
 
-                                                    {p.status === "ACTIVE" ? (
-                                                        <Tooltip title="Deactivate Product">
-                                                            <IconButton
-                                                                size="small"
-                                                                onClick={() => handleDeactivate(p)}
-                                                                color="error"
-                                                            >
-                                                                <BlockRoundedIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    ) : (
-                                                        <Tooltip title="Activate Product">
-                                                            <IconButton
-                                                                size="small"
-                                                                onClick={() => handleActivate(p)}
-                                                                color="success"
-                                                            >
-                                                                <CheckCircleOutlineRoundedIcon fontSize="small" />
-                                                            </IconButton>
+                                                            {p.status === "ACTIVE" ? (
+                                                                <Tooltip title="Deactivate Product">
+                                                                    <IconButton
+                                                                        size="small"
+                                                                        onClick={() => handleDeactivate(p)}
+                                                                        color="error"
+                                                                    >
+                                                                        <BlockRoundedIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            ) : (
+                                                                <Tooltip title="Activate Product">
+                                                                    <IconButton
+                                                                        size="small"
+                                                                        onClick={() => handleActivate(p)}
+                                                                        color="success"
+                                                                    >
+                                                                        <CheckCircleOutlineRoundedIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            )}
+                                                        </>
+                                                    )}
+
+                                                    {/* Staff Controls: Request Restock to Admin */}
+                                                    {isStaff && (
+                                                        <Tooltip title={isLow ? "Request Restock from Admin" : "Stock is currently healthy"}>
+                                                            <span>
+                                                                <Button
+                                                                    size="small"
+                                                                    variant={isLow ? "contained" : "outlined"}
+                                                                    color={isLow ? "warning" : "inherit"}
+                                                                    startIcon={<SendRoundedIcon sx={{ fontSize: 14 }} />}
+                                                                    onClick={() => setStaffRequestProduct(p)}
+                                                                    sx={{
+                                                                        textTransform: "none",
+                                                                        fontWeight: 600,
+                                                                        fontSize: "0.74rem",
+                                                                        py: 0.3,
+                                                                        px: 1,
+                                                                    }}
+                                                                >
+                                                                    Request
+                                                                </Button>
+                                                            </span>
                                                         </Tooltip>
                                                     )}
                                                 </Box>
@@ -611,13 +662,23 @@ export default function Products() {
                 />
             )}
 
-            {/* Restock Inventory Dialog Modal */}
+            {/* Restock Inventory Dialog Modal (ADMIN) */}
             {isAdmin && (
                 <RestockDialog
                     open={Boolean(restockProduct)}
                     product={restockProduct}
                     onClose={() => setRestockProduct(null)}
                     onSuccess={handleRestockSave}
+                />
+            )}
+
+            {/* Request Restock Dialog Modal (STAFF) */}
+            {isStaff && (
+                <RequestRestockDialog
+                    open={Boolean(staffRequestProduct)}
+                    product={staffRequestProduct}
+                    onClose={() => setStaffRequestProduct(null)}
+                    onSuccess={() => setReloadKey((k) => k + 1)}
                 />
             )}
         </Box>

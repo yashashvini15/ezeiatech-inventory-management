@@ -22,6 +22,7 @@ const Checkout = lazy(() => import("./pages/Checkout"));
 const MyOrders = lazy(() => import("./pages/MyOrders"));
 const OrderDetails = lazy(() => import("./pages/OrderDetails"));
 const ManageOrders = lazy(() => import("./pages/ManageOrders"));
+const RestockRequests = lazy(() => import("./pages/RestockRequests"));
 
 function PageLoader() {
     return (
@@ -60,6 +61,7 @@ export default function App() {
                         <Route element={<RoleRoute roles={["ADMIN", "STAFF"]} />}>
                             <Route path="/manage/orders" element={<ManageOrders />} />
                             <Route path="/manage/orders/:id" element={<OrderDetails />} />
+                            <Route path="/restock-requests" element={<RestockRequests />} />
                         </Route>
 
                         <Route element={<AdminRoute />}>

@@ -36,6 +36,7 @@ import HistoryRoundedIcon from "@mui/icons-material/HistoryRounded";
 import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
 import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
+import NotificationsActiveRoundedIcon from "@mui/icons-material/NotificationsActiveRounded";
 import Badge from "@mui/material/Badge";
 import { selectCartCount, clearCart } from "../../store/cartSlice";
 
@@ -114,6 +115,12 @@ export default function DashboardLayout({ children }) {
             label: "Manage Orders",
             path: "/manage/orders",
             icon: <ReceiptLongRoundedIcon />,
+            allowed: role === "ADMIN" || role === "STAFF",
+        },
+        {
+            label: "Restock Requests",
+            path: "/restock-requests",
+            icon: <NotificationsActiveRoundedIcon />,
             allowed: role === "ADMIN" || role === "STAFF",
         },
         {

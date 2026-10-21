@@ -30,6 +30,7 @@ public class InventoryService {
     private final ProductRepository productRepository;
     private final InventoryMovementRepository inventoryMovementRepository;
     private final UserRepository userRepository;
+    private final RestockRequestService restockRequestService;
 
     // Admin stock add karta hai
     @Transactional
@@ -43,6 +44,7 @@ public class InventoryService {
 
         InventoryMovement movement =
                 changeStock(product, MovementType.STOCK_IN, req.getQuantity(), null, user);
+        restockRequestService.fulfillOpenFor(product, user);
         return InventoryMovementResponse.from(movement);
     }
 
