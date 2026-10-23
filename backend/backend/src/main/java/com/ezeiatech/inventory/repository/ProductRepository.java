@@ -22,4 +22,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     @Query("select p from Product p where p.stock <= p.reorderLevel and p.status = ProductStatus.ACTIVE")
     Page<Product> findLowStock(Pageable pageable);
+
+    // dashboard card: findLowStock jaisi hi condition, sirf count
+    @Query("select count(p) from Product p where p.stock <= p.reorderLevel and p.status = ProductStatus.ACTIVE")
+    long countLowStock();
 }
