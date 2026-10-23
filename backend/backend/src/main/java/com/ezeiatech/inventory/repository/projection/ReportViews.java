@@ -22,6 +22,7 @@ public final class ReportViews {
     public interface TopProductView {
         Long getProductId();
         String getName();
+        String getSku();
         Long getQuantity();
         BigDecimal getRevenue();
     }

@@ -25,5 +25,5 @@ public record DashboardStatsResponse(
     public record MonthlySales(String month, BigDecimal sales) {}      // month = "2026-10"
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record TopProduct(Long productId, String name, long quantity, BigDecimal revenue) {}  // revenue ADMIN only
+    public record TopProduct(Long productId, String name, String sku, long quantity, BigDecimal revenue) {}  // revenue ADMIN only
 }

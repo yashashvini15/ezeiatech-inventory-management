@@ -79,7 +79,7 @@ public class DashboardService {
 
         List<TopProduct> top = orderRepository
                 .findTopProducts(OrderStatus.CANCELLED, PageRequest.of(0, TOP_N)).stream()
-                .map(v -> new TopProduct(v.getProductId(), v.getName(), v.getQuantity(),
+                .map(v -> new TopProduct(v.getProductId(), v.getName(), v.getSku(), v.getQuantity(),
                         admin ? v.getRevenue() : null))
                 .toList();
 
