@@ -20,6 +20,7 @@ import {
     CircularProgress,
     Stack,
     Divider,
+    Snackbar,
 } from "@mui/material";
 
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
@@ -27,6 +28,7 @@ import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import FilterListRoundedIcon from "@mui/icons-material/FilterListRounded";
 import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
 export default function Shop() {
     const dispatch = useDispatch();
@@ -44,6 +46,9 @@ export default function Shop() {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    // Cute Add to Cart Toast Notification State
+    const [toast, setToast] = useState({ open: false, productName: "", qty: 1 });
 
     useEffect(() => {
         let cancelled = false;
@@ -265,7 +270,10 @@ export default function Shop() {
                                                 color="primary"
                                                 size="small"
                                                 disabled={isOutOfStock || isMaxInCart}
-                                                onClick={() => dispatch(addToCart({ product: p, qty: 1 }))}
+                                                onClick={() => {
+                                                    dispatch(addToCart({ product: p, qty: 1 }));
+                                                    setToast({ open: true, productName: p.name, qty: 1 });
+                                                }}
                                                 startIcon={<ShoppingCartRoundedIcon sx={{ fontSize: 16 }} />}
                                             >
                                                 {isOutOfStock ? "Out of Stock" : isMaxInCart ? "Max in Cart" : "Add to Cart"}
@@ -290,6 +298,42 @@ export default function Shop() {
             )}
 
             <Pagination page={page} totalPages={totalPages} totalElements={totalElements} onChange={setPage} />
+
+            {/* Cute Add to Cart Toast Snackbar */}
+            <Snackbar
+                open={toast.open}
+                autoHideDuration={3500}
+                onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            >
+                <Alert
+                    onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+                    severity="success"
+                    variant="filled"
+                    icon={<CheckCircleRoundedIcon fontSize="inherit" />}
+                    action={
+                        <Button
+                            color="inherit"
+                            size="small"
+                            onClick={() => navigate("/cart")}
+                            sx={{ fontWeight: 700, textTransform: "none", bgcolor: "rgba(255,255,255,0.2)", px: 1.5, py: 0.2, borderRadius: 1.5 }}
+                        >
+                            View Cart →
+                        </Button>
+                    }
+                    sx={{
+                        width: "100%",
+                        borderRadius: 3,
+                        boxShadow: "0 10px 25px -5px rgba(16, 185, 129, 0.4)",
+                        fontWeight: 600,
+                        alignItems: "center",
+                        backgroundColor: "#10B981",
+                        color: "#FFFFFF",
+                    }}
+                >
+                    Added <strong>{toast.productName}</strong> to your cart! 🛍️
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

@@ -37,6 +37,8 @@ import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
 import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
 import NotificationsActiveRoundedIcon from "@mui/icons-material/NotificationsActiveRounded";
+import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
+import AssessmentRoundedIcon from "@mui/icons-material/AssessmentRounded";
 import Badge from "@mui/material/Badge";
 import { selectCartCount, clearCart } from "../../store/cartSlice";
 
@@ -87,7 +89,7 @@ export default function DashboardLayout({ children }) {
             label: "Dashboard",
             path: "/",
             icon: <DashboardRoundedIcon />,
-            allowed: true, // Everyone can see dashboard
+            allowed: role === "ADMIN" || role === "STAFF",
         },
         {
             label: "Shop Products",
@@ -112,9 +114,21 @@ export default function DashboardLayout({ children }) {
             allowed: role === "CUSTOMER",
         },
         {
+            label: "My Profile",
+            path: "/profile",
+            icon: <Avatar sx={{ width: 22, height: 22, fontSize: "0.75rem", bgcolor: "primary.main" }}>{user?.name ? user.name.charAt(0).toUpperCase() : "U"}</Avatar>,
+            allowed: role === "CUSTOMER",
+        },
+        {
             label: "Manage Orders",
             path: "/manage/orders",
             icon: <ReceiptLongRoundedIcon />,
+            allowed: role === "ADMIN" || role === "STAFF",
+        },
+        {
+            label: "Customers",
+            path: "/customers",
+            icon: <PeopleRoundedIcon />,
             allowed: role === "ADMIN" || role === "STAFF",
         },
         {
@@ -134,6 +148,12 @@ export default function DashboardLayout({ children }) {
             path: "/inventory-history",
             icon: <HistoryRoundedIcon />,
             allowed: role === "ADMIN" || role === "STAFF",
+        },
+        {
+            label: "Reports",
+            path: "/reports",
+            icon: <AssessmentRoundedIcon />,
+            allowed: role === "ADMIN",
         },
         {
             label: "Categories",

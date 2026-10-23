@@ -16,7 +16,8 @@ import java.util.List;
 // "order" SQL ka reserved word hai (ORDER BY), isliye table ka naam "orders"
 @Table(name = "orders", indexes = {
         @Index(name = "idx_orders_customer", columnList = "customer_id"), // "mere orders" jaldi mile
-        @Index(name = "idx_orders_status", columnList = "status")         // status se filter jaldi ho
+        @Index(name = "idx_orders_status", columnList = "status"), // status se filter jaldi ho
+        @Index(name = "idx_orders_created_at", columnList = "created_at")// date range / monthly report jaldi ho
 })
 @Getter
 @Setter
