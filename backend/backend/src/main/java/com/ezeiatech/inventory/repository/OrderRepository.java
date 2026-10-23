@@ -35,11 +35,11 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
 
     // top selling: product join + group by. Pageable sirf LIMIT ke liye (top 5)
     @Query("""
-        select p.id as productId, p.name as name,
+        select p.id as productId, p.name as name, p.sku as sku,
                sum(oi.quantity) as quantity, sum(oi.lineTotal) as revenue
         from OrderItem oi join oi.product p join oi.order o
         where o.status <> :excluded
-        group by p.id, p.name
+        group by p.id, p.name, p.sku
         order by sum(oi.quantity) desc, p.id asc
         """)
     List<TopProductView> findTopProducts(@Param("excluded") OrderStatus excluded, Pageable pageable);
