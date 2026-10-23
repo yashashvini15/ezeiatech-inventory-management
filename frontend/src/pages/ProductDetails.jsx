@@ -18,11 +18,13 @@ import {
     Divider,
     Breadcrumbs,
     Link,
+    Snackbar,
 } from "@mui/material";
 
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
 import Inventory2RoundedIcon from "@mui/icons-material/Inventory2Rounded";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
 export default function ProductDetails() {
     const { id } = useParams();
@@ -34,6 +36,7 @@ export default function ProductDetails() {
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [toast, setToast] = useState({ open: false, message: "" });
 
     useEffect(() => {
         let cancelled = false;
@@ -103,6 +106,10 @@ export default function ProductDetails() {
     const handleAddToCart = () => {
         if (quantity > 0 && maxCanAdd > 0) {
             dispatch(addToCart({ product, qty: quantity }));
+            setToast({
+                open: true,
+                message: `Added ${quantity} × ${product.name} to your cart! 🛍️`,
+            });
         }
     };
 
@@ -191,6 +198,42 @@ export default function ProductDetails() {
                     </Button>
                 </Stack>
             </Card>
+
+            {/* Cute Add to Cart Toast Snackbar */}
+            <Snackbar
+                open={toast.open}
+                autoHideDuration={3500}
+                onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            >
+                <Alert
+                    onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+                    severity="success"
+                    variant="filled"
+                    icon={<CheckCircleRoundedIcon fontSize="inherit" />}
+                    action={
+                        <Button
+                            color="inherit"
+                            size="small"
+                            onClick={() => navigate("/cart")}
+                            sx={{ fontWeight: 700, textTransform: "none", bgcolor: "rgba(255,255,255,0.2)", px: 1.5, py: 0.2, borderRadius: 1.5 }}
+                        >
+                            View Cart →
+                        </Button>
+                    }
+                    sx={{
+                        width: "100%",
+                        borderRadius: 3,
+                        boxShadow: "0 10px 25px -5px rgba(16, 185, 129, 0.4)",
+                        fontWeight: 600,
+                        alignItems: "center",
+                        backgroundColor: "#10B981",
+                        color: "#FFFFFF",
+                    }}
+                >
+                    {toast.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

@@ -11,6 +11,10 @@ import DashboardLayout from "./components/layout/DashboardLayout";
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const Home = lazy(() => import("./pages/Home"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Customers = lazy(() => import("./pages/Customers"));
+const Reports = lazy(() => import("./pages/Reports"));
+const Profile = lazy(() => import("./pages/Profile"));
 const Products = lazy(() => import("./pages/Products"));
 const Categories = lazy(() => import("./pages/Categories"));
 const Suppliers = lazy(() => import("./pages/Suppliers"));
@@ -32,6 +36,28 @@ function PageLoader() {
     );
 }
 
+// Role-based root route resolver:
+// ADMIN/STAFF -> new Dashboard
+// CUSTOMER -> existing Home
+// While loading user profile -> loader
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+
+function RootRouteResolver() {
+    const { user, token } = useSelector((state) => state.auth);
+
+    if (token && !user) {
+        return <PageLoader />;
+    }
+
+    if (user?.role === "ADMIN" || user?.role === "STAFF") {
+        return <Dashboard />;
+    }
+
+    // Customer ke liye redundant dashboard hata kar seedha active Shop par land karwayein
+    return <Navigate to="/shop" replace />;
+}
+
 export default function App() {
     return (
         <BrowserRouter>
@@ -42,7 +68,7 @@ export default function App() {
 
                     {/* Shared persistent layout: Sidebar never unmounts, zero flicker! */}
                     <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-                        <Route path="/" element={<Home />} />
+                        <Route path="/" element={<RootRouteResolver />} />
 
                         {/* Customer Only Routes */}
                         <Route element={<RoleRoute roles={["CUSTOMER"]} />}>
@@ -52,19 +78,23 @@ export default function App() {
                             <Route path="/checkout" element={<Checkout />} />
                             <Route path="/orders" element={<MyOrders />} />
                             <Route path="/orders/:id" element={<OrderDetails />} />
+                            <Route path="/profile" element={<Profile />} />
                         </Route>
 
-                        {/* Inventory & Order Management for Admin and Staff */}
+                        {/* Customers, Inventory & Order Management for Admin and Staff */}
                         <Route path="/products" element={<Products />} />
                         <Route path="/inventory-history" element={<InventoryHistory />} />
 
                         <Route element={<RoleRoute roles={["ADMIN", "STAFF"]} />}>
+                            <Route path="/customers" element={<Customers />} />
                             <Route path="/manage/orders" element={<ManageOrders />} />
                             <Route path="/manage/orders/:id" element={<OrderDetails />} />
                             <Route path="/restock-requests" element={<RestockRequests />} />
                         </Route>
 
+                        {/* Admin Only Routes */}
                         <Route element={<AdminRoute />}>
+                            <Route path="/reports" element={<Reports />} />
                             <Route path="/categories" element={<Categories />} />
                             <Route path="/suppliers" element={<Suppliers />} />
                         </Route>
