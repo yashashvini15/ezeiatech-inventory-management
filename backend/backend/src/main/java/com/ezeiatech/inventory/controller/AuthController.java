@@ -2,6 +2,7 @@ package com.ezeiatech.inventory.controller;
 
 import com.ezeiatech.inventory.dto.*;
 import com.ezeiatech.inventory.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request){
-        return ResponseEntity.ok(ApiResponse.ok("Login successfully", authService.login(request)));
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request,
+                                                           HttpServletRequest http) {
+        return ResponseEntity.ok(ApiResponse.ok("Login successfully",
+                authService.login(request, http.getRemoteAddr())));
     }
 
     @GetMapping("/me")
