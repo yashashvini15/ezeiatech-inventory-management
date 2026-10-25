@@ -2,14 +2,60 @@ services:
   postgres:
     image: postgres:16
     container_name: inventory-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"   # sirf tumhare laptop se, LAN se nahi
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    profiles: ["app"]
+    build: ./backend/backend
+    image: ${DOCKERHUB_USER:-local}/inventory-backend:${IMAGE_TAG:-latest}
+    container_name: inventory-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-7200000}
+      CORS_ALLOWED_ORIGINS: http://localhost:${FRONTEND_PORT:-3000}
+      ORDER_TAX_RATE: ${ORDER_TAX_RATE:-0.18}
+      REPORT_ZONE: ${REPORT_ZONE:-Asia/Kolkata}
+      LOGIN_MAX_ATTEMPTS: ${LOGIN_MAX_ATTEMPTS:-5}
+      LOGIN_MAX_ATTEMPTS_PER_IP: ${LOGIN_MAX_ATTEMPTS_PER_IP:-20}
+      LOGIN_WINDOW_SECONDS: ${LOGIN_WINDOW_SECONDS:-900}
+      FORWARD_HEADERS_STRATEGY: native
+    expose:
+      - "8080"   # bahar publish nahi, sirf nginx pahunch sakta hai
+
+  frontend:
+    profiles: ["app"]
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: /api
+    image: ${DOCKERHUB_USER:-local}/inventory-frontend:${IMAGE_TAG:-latest}
+    container_name: inventory-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-3000}:8080"
 
 volumes:
   pgdata:

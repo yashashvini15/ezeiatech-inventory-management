@@ -250,7 +250,7 @@ export default function InventoryHistory() {
                             <TableCell sx={{ fontWeight: 600, color: "text.secondary", fontSize: "0.8rem", py: 1.5 }}>
                                 PERFORMED BY
                             </TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 600, color: "text.secondary", fontSize: "0.8rem", py: 1.5 }}>
+                            <TableCell sx={{ fontWeight: 600, color: "text.secondary", fontSize: "0.8rem", py: 1.5 }}>
                                 DATE & TIME
                             </TableCell>
                         </TableRow>
@@ -331,7 +331,7 @@ export default function InventoryHistory() {
                                             </Typography>
                                         </TableCell>
 
-                                        <TableCell align="right" sx={{ py: 1.2 }}>
+                                        <TableCell sx={{ py: 1.2 }}>
                                             <Typography variant="caption" sx={{ color: "text.secondary" }}>
                                                 {m.createdAt ? new Date(m.createdAt).toLocaleString("en-IN") : "—"}
                                             </Typography>
